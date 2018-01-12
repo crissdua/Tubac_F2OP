@@ -1,1 +1,17 @@
 c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\bin\Debug\Tubac_F2OP.exe.config
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Tubac_F2OP.vbprojResolveAssemblyReference.cache
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Interop.SAPbobsCOM.dll
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Interop.SAPbouiCOM.dll
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Tubac_F2OP.vbproj.ResolveComReference.cache
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Tubac_F2OP.cParametros.resources
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Tubac_F2OP.Login.resources
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Tubac_F2OP.Resources.resources
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Tubac_F2OP.Parametros.resources
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Tubac_F2OP.vbproj.GenerateResource.Cache
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Tubac_F2OP.xml
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Tubac_F2OP.FrmP.resources
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\bin\Debug\Tubac_F2OP.exe
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\bin\Debug\Tubac_F2OP.pdb
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\bin\Debug\Tubac_F2OP.xml
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Tubac_F2OP.exe
+c:\users\cristhiam\documents\visual studio 2015\Projects\Tubac_F2OP\Tubac_F2OP\obj\Debug\Tubac_F2OP.pdb

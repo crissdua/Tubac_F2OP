@@ -79,11 +79,11 @@
     <Compile Include="cParametros.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.vb">
+    <Compile Include="FrmP.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.vb">
-      <DependentUpon>Form1.vb</DependentUpon>
+    <Compile Include="FrmP.Designer.vb">
+      <DependentUpon>FrmP.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Login.Designer.vb">
@@ -117,6 +117,9 @@
   <ItemGroup>
     <EmbeddedResource Include="cParametros.resx">
       <DependentUpon>cParametros.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmP.resx">
+      <DependentUpon>FrmP.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Login.resx">
       <DependentUpon>Login.vb</DependentUpon>
