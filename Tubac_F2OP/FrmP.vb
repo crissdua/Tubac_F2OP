@@ -1,6 +1,10 @@
 ﻿Imports System.Windows.Forms
 Imports System.IO
 Imports System.Data.SqlClient
+Imports CrystalDecisions.Shared
+Imports CrystalDecisions.CrystalReports.Engine
+Imports CrystalDecisions.Windows.Forms
+Imports CrystalDecisions.ReportSource
 Public Class FrmP
 #Region "Variables"
     Public con As New Conexion
@@ -10,11 +14,10 @@ Public Class FrmP
     Dim connectionString As String = Conexion.ObtenerConexion.ConnectionString
     Public Ready As Boolean
     Private Const CP_NOCLOSE_BUTTON As Integer = &H200
-    Public Shared oInvGenExit As SAPbobsCOM.Documents
     Public Shared SQL_Conexion As SqlConnection = New SqlConnection()
     Public Shared ba As New List(Of String)
     Public Shared quantity As New List(Of Integer)
-
+    Public Shared wo As SAPbobsCOM.ProductionOrders
 #End Region
     Protected Overloads Overrides ReadOnly Property CreateParams() As CreateParams
         Get
@@ -41,6 +44,7 @@ Public Class FrmP
 
     Private Sub FrmP_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         TextBox2.Select()
+        ComboBox1.DropDownStyle = ComboBoxStyle.DropDownList
         cargaORDER()
     End Sub
 
@@ -56,6 +60,9 @@ Public Class FrmP
         txtOrder.Text = DGV(0, DGV.CurrentCell.RowIndex).Value.ToString()
         Panel1.Visible = True
         DGV2.Visible = True
+        Button4.Visible = True
+        Button5.Visible = True
+        DGV3.Visible = True
         Dim SQL_da As SqlDataAdapter = New SqlDataAdapter("SELECT T0.ItemCode, T2.ItemName, T0.PlannedQty FROM OWOR T0 inner join OITM T2 on T0.ItemCode = T2.ItemCode where T0.DocNum= '" + txtOrder.Text + "'", con.ObtenerConexion())
         Dim DT_dat As System.Data.DataTable = New System.Data.DataTable()
         SQL_da.Fill(DT_dat)
@@ -73,9 +80,9 @@ Public Class FrmP
         result2 = DateTime.Compare(turnoAM_F, TimeOfDay.ToShortTimeString)
         If result = -1 Then
             If result2 = 1 Then
-                Label9.Text = "Turno Dia"
+                ComboBox1.Text = "AM"
             Else
-                Label9.Text = "Turno Noche"
+                ComboBox1.Text = "PM"
             End If
         End If
     End Sub
@@ -87,4 +94,170 @@ Public Class FrmP
         DGV2.DataSource = DT_dat
         con.ObtenerConexion.Close()
     End Sub
+
+    Private Sub Update()
+        Dim oReturn As Integer = -1
+        Dim oError As Integer = 0
+        Dim errMsg As String = ""
+        Dim sql As String
+        Dim oRecordSet As SAPbobsCOM.Recordset
+        Dim objectCode As Integer
+
+        Dim itemname As String
+        Dim pesoreal As Double
+        Dim postdate As String
+
+        Try
+            Dim result As Integer = MessageBox.Show("Desea Ingresar la Orden?", "Atencion", MessageBoxButtons.YesNoCancel)
+            If result = DialogResult.Cancel Then
+                MessageBox.Show("Cancelado")
+            ElseIf result = DialogResult.No Then
+                MessageBox.Show("No se realizara la orden")
+            ElseIf result = DialogResult.Yes Then
+                Dim cont As Integer = 0
+                For Each row As DataGridViewRow In DGV3.Rows
+
+                    If con.Connected = True Then
+                        sql = ("select T0.DocEntry, T0.ItemCode, T1.itemName, T0.PlannedQty,T0.PostDate,T0.DueDate from OWOR T0 inner join OITM T1 on T0.itemcode = t1.itemcode where T0.Docnum = '" + DGV3.Rows(cont).Cells.Item(0).Value.ToString + "'")
+                        oRecordSet = con.oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                        oRecordSet.DoQuery(sql)
+                        If oRecordSet.RecordCount > 0 Then
+                            objectCode = oRecordSet.Fields.Item(0).Value
+                            itemcode = oRecordSet.Fields.Item(1).Value
+                            itemname = oRecordSet.Fields.Item(2).Value
+                            pesoreal = oRecordSet.Fields.Item(3).Value
+                            postdate = oRecordSet.Fields.Item(4).Value
+                        End If
+
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordSet)
+                        oRecordSet = Nothing
+                        GC.Collect()
+                        'Dim items As String
+                        'For Each row As DataGridViewRow In DGV2.Rows
+                        '    items += row.Cells(0).Value.ToString + "|"
+                        'Next
+                        'imprime(items.TrimEnd("|"), itemname, "AnchoTira", pesoreal, items.TrimEnd("|"), "heat", "coil", docdate)
+
+
+
+
+                        wo = con.oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oProductionOrders)
+                        wo.GetByKey(objectCode)
+                        wo.ProductionOrderStatus = SAPbobsCOM.BoProductionOrderStatusEnum.boposReleased
+                        'wo.Update()
+                        oReturn = wo.Update()
+                        If oReturn <> 0 Then
+                            MessageBox.Show(con.oCompany.GetLastErrorDescription)
+                        Else
+
+                            Dim items As String
+                            sql = ("select T0.ItemCode from wor1 T0 where T0.DocEntry = '" + objectCode.ToString + "'")
+                            'sql = ("SELECT DocEntry FROM WOR1 where DocEntry = " + objectCode + "")
+                            oRecordSet = con.oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                            oRecordSet.DoQuery(sql)
+                            Do While Not oRecordSet.EoF
+                                items += oRecordSet.Fields.Item(0).Value & "|"
+                                oRecordSet.MoveNext()
+                            Loop
+
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordSet)
+                            oRecordSet = Nothing
+                            GC.Collect()
+                            imprime(items.TrimEnd("|"), itemname, "AnchoTira", pesoreal, items.TrimEnd("|"), "heat", "coil", postdate, ComboBox1.Text)
+                            itemcode = String.Empty
+                            items = String.Empty
+                            Panel1.Visible = False
+                            DGV2.Visible = True
+                            cargaORDER()
+                            DGV2.DataSource = Nothing
+                            DGV3.Rows.Clear()
+                        End If
+
+                    End If
+                    cont = cont + 1
+                Next
+                con.oCompany.Disconnect()
+                con.oCompany = Nothing
+            End If
+        Catch ex As Exception
+            MsgBox("Error: " + ex.Message.ToString)
+            con.oCompany.Disconnect()
+            con.oCompany = Nothing
+        End Try
+    End Sub
+    Private Function FormatBarCode(code As String)
+        Dim barcode As String = String.Empty
+        barcode = String.Format("*{0}*", code)
+        Return barcode
+    End Function
+    Private Sub imprime(bat As String, desc As String, anch As String, pes As String, bob As String, het As String, coi As String, ordr As String, turnos As String)
+        Dim Report1 As New CrystalDecisions.CrystalReports.Engine.ReportDocument()
+        Report1.PrintOptions.PaperOrientation = PaperOrientation.Portrait
+        Report1.Load(Application.StartupPath + "\Report\Informe.rpt", CrystalDecisions.Shared.OpenReportMethod.OpenReportByDefault.OpenReportByDefault)
+        Report1.SetParameterValue("CodBatch", itemcode)
+        'Report1.SetParameterValue("CodBatch", txtBarcode.Text)
+        Report1.SetParameterValue("descripcion", desc)
+        Report1.SetParameterValue("anchotira", anch)
+        Report1.SetParameterValue("pesoreal", pes)
+        Report1.SetParameterValue("bobina", bob)
+        Report1.SetParameterValue("heat", het)
+        Report1.SetParameterValue("coil", coi)
+        Report1.SetParameterValue("ordencorte", ordr)
+        Report1.SetParameterValue("fechacorte", Now.ToShortDateString)
+        Report1.SetParameterValue("turno", turnos)
+        'CrystalReportViewer1.ReportSource = Report1
+        Report1.PrintToPrinter(1, False, 0, 0)
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Try
+            If con.Connected Then
+                Update()
+            Else
+                con.MakeConnectionSAP()
+                If con.Connected Then
+                    Update()
+                Else
+                    MessageBox.Show("Error de Conexion, intente Nuevamente")
+                End If
+            End If
+        Catch ex As Exception
+            MsgBox("Error: " + ex.Message.ToString)
+        End Try
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Dim result As Integer = MessageBox.Show("Desea limpiar el objeto?", "Atencion", MessageBoxButtons.YesNoCancel)
+        If result = DialogResult.Cancel Then
+            MessageBox.Show("Cancelado")
+        ElseIf result = DialogResult.No Then
+            MessageBox.Show("Puede continuar!")
+        ElseIf result = DialogResult.Yes Then
+            TextBox2.Clear()
+            txtOrder.Text = ""
+            wo = Nothing
+            DGV.DataSource = Nothing
+            DGV2.DataSource = Nothing
+            DGV3.Rows.Clear()
+            MessageBox.Show("Inicie un objeto nuevo")
+        End If
+        Panel1.Visible = False
+        DGV2.Visible = False
+    End Sub
+
+    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+
+        Dim existe As Boolean = DGV3.Rows.Cast(Of DataGridViewRow).Any(Function(x) CInt(x.Cells("Ordenes").Value) = DGV(0, DGV.CurrentCell.RowIndex).Value.ToString())
+        If Not existe Then
+            DGV3.Rows.Add(DGV(0, DGV.CurrentCell.RowIndex).Value.ToString())
+        Else
+            MessageBox.Show("Ya ingreso ese numero de orden")
+        End If
+    End Sub
+
+    Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
+        DGV3.Rows.Remove(DGV3.CurrentRow)
+    End Sub
+
+
 End Class

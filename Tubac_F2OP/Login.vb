@@ -23,7 +23,7 @@ Public Class Login
         If TextBox1.Text = String.Empty Or TextBox2.Text = String.Empty Then
             MessageBox.Show("Verifique Nombre y contraseña")
         Else
-            Dim SQL_da As SqlCommand = New SqlCommand("SELECT count(*) FROM [dbo].[@TUBAC_F1]  T0 where T0.Code ='" + TextBox1.Text + "' and T0.Name ='" + TextBox2.Text + "';", con.ObtenerConexion())
+            Dim SQL_da As SqlCommand = New SqlCommand("SELECT count(*) FROM [dbo].[@TUBAC_PRODUCCION]  T0 where T0.Code ='" + TextBox1.Text + "' and T0.Name ='" + TextBox2.Text + "';", con.ObtenerConexion())
             Dim obj As Object = SQL_da.ExecuteScalar()
             If obj > 0 Then
                 Dim user As String
